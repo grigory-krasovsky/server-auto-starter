@@ -1,3 +1,23 @@
 spring:
   application:
     name: ServerAutoStarter
+  datasource:
+    url: jdbc:postgresql://localhost:5432/db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+    jpa:
+      hibernate:
+        ddl-auto: validate
+        show-sql: true
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+          format_sql: true
+  flyway:
+    url: jdbc:postgresql://localhost:5432/db
+    user: user
+    password: password
+
+#hetzner:
+#  token:
