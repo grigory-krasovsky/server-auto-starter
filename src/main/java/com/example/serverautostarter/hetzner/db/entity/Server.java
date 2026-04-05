@@ -1,30 +1,26 @@
 package com.example.serverautostarter.hetzner.db.entity;
 
+import com.example.serverautostarter.common.db.entity.AbstractEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
 @Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
 @Table(name = "server")
-public class Server {
-    @Id
-    Long id;
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Server extends AbstractEntity {
     String name;
     String ip;
-    LocalDateTime created;
     Boolean blocked;
     String rootPassEncrypted;
     Long hetznerId;
-
 }

@@ -1,4 +1,4 @@
-package com.example.serverautostarter.enums;
+package com.example.serverautostarter.hetzner.enums;
 
 
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.example.serverautostarter.hetzner.dto;
+package com.example.serverautostarter.hetzner.controller.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

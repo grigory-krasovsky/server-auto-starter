@@ -1,6 +1,6 @@
 package com.example.serverautostarter.hetzner.db.pojo;
 
-import com.example.serverautostarter.hetzner.dto.ServerDto;
+import com.example.serverautostarter.hetzner.controller.dto.ServerDto;
 import lombok.Builder;
 import lombok.Data;
 

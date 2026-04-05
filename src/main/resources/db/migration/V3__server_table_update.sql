@@ -1,2 +1,2 @@
-ALTER TABLE server ADD COLUMN rootPassEncrypted text;
-ALTER TABLE server ADD COLUMN hetznerId BIGINT;
+ALTER TABLE server ADD COLUMN root_pass_encrypted text;
+ALTER TABLE server ADD COLUMN hetzner_id BIGINT;

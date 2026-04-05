@@ -15,6 +15,6 @@ public class HetznerConnector {
 
     @Bean
     public HetznerCloudAPI getClient() {
-        return new HetznerCloudAPI("", APIType.CLOUD);
+        return new HetznerCloudAPI("Uyt7acO9diYTQKbdvgPbX8Uf8wzG8IhsQsVXILvWyO8YxscCOwywneeK4mYnzL8H", APIType.CLOUD);
     }
 }

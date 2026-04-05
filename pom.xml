@@ -65,10 +65,16 @@
             <scope>provided</scope>
         </dependency>
 
+<!--        business-->
         <dependency>
             <groupId>io.github.sinuscosinustan</groupId>
             <artifactId>hetznercloud-api</artifactId>
             <version>5.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.mwiede</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.2.19</version>
         </dependency>
     </dependencies>
 
