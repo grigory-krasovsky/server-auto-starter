@@ -25,6 +25,8 @@ public class PasswordManagerImpl implements PasswordManager {
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
     @Value("${ENCRYPTION_KEY:MySuperSecretKey123}")
     private String ENCRYPTION_KEY;
+    @Value("${AMNEZIA_PASS}")
+    private String AMNEZIA_PASS;
 
     @Override
     public String encrypt(String pass) {
@@ -84,6 +86,11 @@ public class PasswordManagerImpl implements PasswordManager {
             throw new RuntimeException(e);
         }
         return new String(decrypted);
+    }
+
+    @Override
+    public String getAmneziaPass() {
+        return AMNEZIA_PASS;
     }
 
     private SecretKeySpec getKeySpec() {

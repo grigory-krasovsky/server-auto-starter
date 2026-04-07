@@ -7,7 +7,8 @@ import static com.example.serverautostarter.common.service.SshService.DEFAULT_TI
 @Getter
 public enum ServerCommands {
     USER_CREATION(ServerStatus.USER_CREATED, "sudo useradd -m amnezia" , DEFAULT_TIMEOUT_SECONDS, 1),
-    PASS_CREATION(ServerStatus.USER_PASS_CREATED, "sudo passwd amnezia", DEFAULT_TIMEOUT_SECONDS, 2),
+    //Todo amnezia pass is dangerous here. should be taken from env variables
+    PASS_CREATION(ServerStatus.USER_PASS_CREATED, "sudo passwd ${AMNEZIA_PASS}", DEFAULT_TIMEOUT_SECONDS, 2),
     SUDO_ENABLING(ServerStatus.USER_ADDED_TO_SUDO, "sudo usermod -aG sudo amnezia", DEFAULT_TIMEOUT_SECONDS, 3),
     NO_PASS_ENABLED(ServerStatus.USER_NO_PASS_ENABLED, "echo 'amnezia ALL=(ALL) NOPASSWD:ALL' | sudo tee /etc/sudoers.d/amnezia", DEFAULT_TIMEOUT_SECONDS, 4);
     ServerStatus serverDesiredStatus;

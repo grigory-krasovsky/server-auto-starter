@@ -35,7 +35,7 @@ public class ServerController {
 
     @PostMapping("/test-scripts")
     public void runTestScripts(@RequestBody ScriptDto scriptDto) {
-        serverProvisioner.runTestScripts(scriptDto.getIp(), scriptDto.getRootPass());
+        serverProvisioner.runInitialScripts(scriptDto.getIp(), scriptDto.getRootPass());
     }
 
     @PostMapping("/reset-root-pass")

@@ -43,6 +43,13 @@ public class LogServiceImpl implements LogService {
                 .build(), LogLevel.ERROR);
     }
 
+    @Override
+    public void saveError(String message) {
+        save(Log.builder()
+                .message(message)
+                .build(), LogLevel.ERROR);
+    }
+
     private void save(Log log, LogLevel level) {
         log.setLevel(level);
         log.setThread(Thread.currentThread().getName());

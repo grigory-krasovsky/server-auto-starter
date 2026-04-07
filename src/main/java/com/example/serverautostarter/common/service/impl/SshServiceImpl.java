@@ -3,10 +3,12 @@ package com.example.serverautostarter.common.service.impl;
 import com.example.serverautostarter.common.dto.CommandRequestDto;
 import com.example.serverautostarter.common.dto.CommandResultDto;
 import com.example.serverautostarter.common.service.SshService;
+import com.example.serverautostarter.utils.service.LogService;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -18,7 +20,7 @@ public class SshServiceImpl implements SshService {
     Session session = null;
 
     @Override
-    public Map<CommandRequestDto, CommandResultDto> runInitialScripts(String ip, String rootPass, List<CommandRequestDto> commands) {
+    public Map<CommandRequestDto, CommandResultDto> runScripts(String ip, String rootPass, String amneziaPass, List<CommandRequestDto> commands, LogService logger) {
 
         Map<CommandRequestDto, CommandResultDto> resultMap = new HashMap<>();
 
@@ -26,9 +28,17 @@ public class SshServiceImpl implements SshService {
             connect(ip, "root", rootPass);
 
             for (CommandRequestDto request : commands) {
-                resultMap.put(request, executeCommand(request));
+                request.setScript(request.getScript().replace("${AMNEZIA_PASS}", amneziaPass));
+                CommandResultDto commandResultDto = executeCommand(request);
+                resultMap.put(request, commandResultDto);
+                if (commandResultDto.getExitCode() == -1) {
+                    logger.saveError(String.format("Сервер: %s. Команда не выполнена. Ошибка: %s", ip, commandResultDto.getError()));
+                } else {
+                    logger.saveInfo(String.format("Сервер: %s. Команда выполнена. Статус: %s", ip, request.getDesiredStatus()));
+                }
             }
         } catch (JSchException e) {
+            logger.saveError(String.format("Не удалось присоединиться к серверу %s", ip), e);
             throw new RuntimeException(String.format("Не удалось присоединиться к серверу %s", ip), e);
         } finally {
             disconnect();
