@@ -2,8 +2,6 @@ package com.example.serverautostarter.utils.service.impl;
 
 import com.example.serverautostarter.utils.service.LogService;
 import com.example.serverautostarter.utils.service.PasswordManager;
-import lombok.AllArgsConstructor;
-import lombok.Generated;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,17 +12,14 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
 public class PasswordManagerImpl implements PasswordManager {
 
-    private LogService logService;
+    private final LogService logService;
 
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
@@ -33,29 +28,28 @@ public class PasswordManagerImpl implements PasswordManager {
 
     @Override
     public String encrypt(String pass) {
-        SecretKeySpec keySpec = getKeySpec();
-        Cipher cipher;
         try {
-            cipher = Cipher.getInstance(TRANSFORMATION);
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
-            logService.saveError("Ошибка во время кодировки 1", e);
-            throw new RuntimeException(e);
-        }
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec);
-        } catch (InvalidKeyException e) {
-            logService.saveError("Ошибка во время кодировки 2", e);
-            throw new RuntimeException(e);
-        }
+            SecretKeySpec keySpec = getKeySpec();
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION);
 
-        byte[] encryptedBytes;
-        try {
-            encryptedBytes = cipher.doFinal(pass.getBytes());
-        } catch (IllegalBlockSizeException | BadPaddingException e) {
-            logService.saveError("Ошибка во время кодировки 3", e);
+            byte[] iv = new byte[16];
+            new SecureRandom().nextBytes(iv);
+            IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
+
+            byte[] encryptedBytes = cipher.doFinal(pass.getBytes());
+
+            byte[] combined = new byte[iv.length + encryptedBytes.length];
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
+
+            return Base64.getEncoder().encodeToString(combined);
+
+        } catch (Exception e) {
+            logService.saveError("Ошибка во время кодировки", e);
             throw new RuntimeException(e);
         }
-        return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     @Override
@@ -67,7 +61,7 @@ public class PasswordManagerImpl implements PasswordManager {
         System.arraycopy(combined, 0, iv, 0, 16);
         System.arraycopy(combined, 16, encrypted, 0, encrypted.length);
 
-        SecretKeySpec keySpec = new SecretKeySpec(ENCRYPTION_KEY.getBytes(), ALGORITHM);
+        SecretKeySpec keySpec = getKeySpec();
         Cipher cipher;
         try {
             cipher = Cipher.getInstance(TRANSFORMATION);

@@ -1,9 +1,7 @@
 package com.example.serverautostarter.hetzner.db.entity;
 
 import com.example.serverautostarter.common.db.entity.AbstractEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +17,8 @@ public class ServerStatus extends AbstractEntity {
     @ManyToOne
     Server server;
     Boolean creationInitiated;
-    Boolean status;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "TEXT")
+    com.example.serverautostarter.hetzner.enums.ServerStatus status;
     String error;
 }

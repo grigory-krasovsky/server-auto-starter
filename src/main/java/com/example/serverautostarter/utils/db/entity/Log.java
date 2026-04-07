@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class Log extends AbstractEntity {
     String message;
-    String stackStrace;
+    String stackTrace;
     String thread;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "TEXT")

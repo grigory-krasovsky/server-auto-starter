@@ -1,7 +1,7 @@
 package com.example.serverautostarter.hetzner.controller;
 
 import com.example.serverautostarter.hetzner.controller.dto.ScriptDto;
-import com.example.serverautostarter.hetzner.db.pojo.ServerPojo;
+import com.example.serverautostarter.hetzner.pojo.ServerPojo;
 import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
 import com.example.serverautostarter.hetzner.service.ServerManager;
 import com.example.serverautostarter.hetzner.service.ServerProvisioner;
@@ -25,7 +25,7 @@ public class ServerController {
 
     @PostMapping("/servers")
     public void createServer(@RequestBody ServerRequestDto serverRequestDto) {
-        serverManager.createNewServer(ServerPojo.from(serverRequestDto));
+        serverManager.createNewServer(serverRequestDto);
     }
 
     @DeleteMapping("/servers/{id}")

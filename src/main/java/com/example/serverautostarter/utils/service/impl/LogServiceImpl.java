@@ -3,7 +3,6 @@ package com.example.serverautostarter.utils.service.impl;
 import com.example.serverautostarter.utils.db.entity.Log;
 import com.example.serverautostarter.utils.db.repository.LogJpaRepository;
 import com.example.serverautostarter.utils.enums.LogLevel;
-import com.example.serverautostarter.utils.pojo.LogPojo;
 import com.example.serverautostarter.utils.service.LogService;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,10 +14,9 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LogServiceImpl implements LogService {
     LogJpaRepository logJpaRepository;
 
@@ -41,7 +39,7 @@ public class LogServiceImpl implements LogService {
     public void saveError(String message, Throwable e) {
         save(Log.builder()
                 .message(message)
-                .stackStrace(getStackTrace(e))
+                .stackTrace(getStackTrace(e))
                 .build(), LogLevel.ERROR);
     }
 

@@ -3,15 +3,16 @@ package com.example.serverautostarter.utils.service.impl;
 import com.example.serverautostarter.utils.service.PasswordManager;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AllArgsConstructor
 public class PasswordManagerImplTest {
 
+    @Autowired
     private PasswordManager passwordManager;
 
     @Test
