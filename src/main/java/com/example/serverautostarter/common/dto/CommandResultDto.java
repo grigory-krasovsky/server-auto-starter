@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommandResult {
+public class CommandResultDto {
     int exitCode;
     String output;
     String error;

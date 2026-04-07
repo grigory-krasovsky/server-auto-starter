@@ -1,6 +1,6 @@
 package com.example.serverautostarter.hetzner.db.pojo;
 
-import com.example.serverautostarter.hetzner.controller.dto.ServerDto;
+import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,11 +14,11 @@ public class ServerPojo {
     String ip;
     String name;
     Boolean blocked;
-    LocalDateTime created;
+    String passDecrypted;
 
-    public static ServerPojo from(ServerDto serverDto) {
+    public static ServerPojo from(ServerRequestDto serverRequestDto) {
         return ServerPojo.builder()
-                .name(serverDto.getName())
+                .name(serverRequestDto.getName())
                 .build();
     }
 }

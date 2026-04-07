@@ -1,10 +1,12 @@
 package com.example.serverautostarter.hetzner.service.impl;
 
+import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
 import com.example.serverautostarter.hetzner.enums.OsType;
 import com.example.serverautostarter.hetzner.enums.ServerType;
 import com.example.serverautostarter.hetzner.db.pojo.ServerPojo;
 import com.example.serverautostarter.hetzner.service.ServerManager;
 import com.example.serverautostarter.hetzner.service.ServerProvisioner;
+import com.example.serverautostarter.utils.service.LogService;
 import io.github.sinuscosinustan.hetznercloud.HetznerCloudAPI;
 import io.github.sinuscosinustan.hetznercloud.objects.request.CreateServerRequest;
 import io.github.sinuscosinustan.hetznercloud.objects.response.CreateServerResponse;
@@ -22,6 +24,7 @@ public class ServerManagerImpl implements ServerManager {
 
     HetznerCloudAPI hetznerCloudAPI;
     ServerProvisioner serverProvisioner;
+    LogService logService;
 
     @Override
     public ServersResponse listAllServers() {
@@ -29,7 +32,7 @@ public class ServerManagerImpl implements ServerManager {
     }
 
     @Override
-    public Boolean createNewServer(ServerPojo serverPojo) {
+    public CreateServerResponse createNewServer(ServerPojo serverPojo) {
         try {
             CreateServerResponse server = hetznerCloudAPI.createServer(CreateServerRequest.builder()
                     .name(serverPojo.getName())
@@ -37,7 +40,10 @@ public class ServerManagerImpl implements ServerManager {
                     .image(OsType.UBUNTU_24_04.getCode())
                     .startAfterCreate(true)
                     .build());
-            return true;
+            Long serverId = server.getServer().getId();
+            logService.saveInfo(String.format("Новый сервер с названием %s создан. Id %s", serverPojo.getName(), serverId));
+            return server;
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -54,12 +60,21 @@ public class ServerManagerImpl implements ServerManager {
     }
 
     @Override
-    public Boolean resetRootPasswordServer(Long serverId) {
+    public String resetRootPassword(Long serverId) {
         try {
             ResetRootPasswordResponse resetRootPasswordResponse = hetznerCloudAPI.resetRootPassword(serverId);
-            return true;
+            return resetRootPasswordResponse.getRootPassword();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
+//    @Override
+//    public Boolean runDefaultPipeline(ServerRequestDto serverRequestDto) {
+//        CreateServerResponse newServer = createNewServer(ServerPojo.from(serverRequestDto));
+//        Long serverId = newServer.getServer().getId();
+//        logService.saveInfo(String.format("Новый сервер с названием %s создан. Id %s", serverRequestDto.getName(), serverId));
+//        String newPass = resetRootPassword(serverId);
+//        logService.saveInfo(String.format("Новый сервер с названием %s создан. Id %s", serverRequestDto.getName(), serverId));
+//    }
 }

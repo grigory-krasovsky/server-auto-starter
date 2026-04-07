@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 @Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommandRequest {
+public class CommandRequestDto {
     @NotNull
     String script;
     @NotNull
@@ -19,8 +19,8 @@ public class CommandRequest {
     String description;
     ServerStatus desiredStatus;
 
-    public static CommandRequest from(ServerCommands serverCommands) {
-        return CommandRequest.builder()
+    public static CommandRequestDto from(ServerCommands serverCommands) {
+        return CommandRequestDto.builder()
                 .script(serverCommands.getScript())
                 .desiredStatus(serverCommands.getServerDesiredStatus())
                 .description(serverCommands.getServerDesiredStatus().getDescription())

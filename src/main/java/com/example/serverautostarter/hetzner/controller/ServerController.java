@@ -2,7 +2,7 @@ package com.example.serverautostarter.hetzner.controller;
 
 import com.example.serverautostarter.hetzner.controller.dto.ScriptDto;
 import com.example.serverautostarter.hetzner.db.pojo.ServerPojo;
-import com.example.serverautostarter.hetzner.controller.dto.ServerDto;
+import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
 import com.example.serverautostarter.hetzner.service.ServerManager;
 import com.example.serverautostarter.hetzner.service.ServerProvisioner;
 import lombok.AccessLevel;
@@ -24,8 +24,8 @@ public class ServerController {
     }
 
     @PostMapping("/servers")
-    public void createServer(@RequestBody ServerDto serverDto) {
-        serverManager.createNewServer(ServerPojo.from(serverDto));
+    public void createServer(@RequestBody ServerRequestDto serverRequestDto) {
+        serverManager.createNewServer(ServerPojo.from(serverRequestDto));
     }
 
     @DeleteMapping("/servers/{id}")
@@ -39,7 +39,7 @@ public class ServerController {
     }
 
     @PostMapping("/reset-root-pass")
-    public void runTestScripts(@RequestBody ServerDto serverDto) {
-        serverManager.resetRootPasswordServer(serverDto.getHetznerId());
+    public void runTestScripts(@RequestBody ServerRequestDto serverRequestDto) {
+        serverManager.resetRootPassword(serverRequestDto.getHetznerId());
     }
 }

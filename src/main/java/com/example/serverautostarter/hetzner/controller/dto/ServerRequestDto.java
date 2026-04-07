@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
-public class ServerDto {
+public class ServerRequestDto {
 
     @NonNull
     String name;

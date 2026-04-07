@@ -1,14 +1,12 @@
 package com.example.serverautostarter.common.service.impl;
 
-import com.example.serverautostarter.common.dto.CommandRequest;
-import com.example.serverautostarter.common.dto.CommandResult;
+import com.example.serverautostarter.common.dto.CommandRequestDto;
+import com.example.serverautostarter.common.dto.CommandResultDto;
 import com.example.serverautostarter.common.service.SshService;
-import com.example.serverautostarter.hetzner.enums.ServerStatus;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -20,14 +18,14 @@ public class SshServiceImpl implements SshService {
     Session session = null;
 
     @Override
-    public Map<CommandRequest, CommandResult> runInitialScripts(String ip, String rootPass, List<CommandRequest> commands) {
+    public Map<CommandRequestDto, CommandResultDto> runInitialScripts(String ip, String rootPass, List<CommandRequestDto> commands) {
 
-        Map<CommandRequest, CommandResult> resultMap = new HashMap<>();
+        Map<CommandRequestDto, CommandResultDto> resultMap = new HashMap<>();
 
         try {
             connect(ip, "root", rootPass);
 
-            for (CommandRequest request : commands) {
+            for (CommandRequestDto request : commands) {
                 resultMap.put(request, executeCommand(request));
             }
         } catch (JSchException e) {
@@ -55,9 +53,9 @@ public class SshServiceImpl implements SshService {
         }
     }
 
-    private CommandResult executeCommand(CommandRequest request) {
+    private CommandResultDto executeCommand(CommandRequestDto request) {
         ChannelExec channel = null;
-        CommandResult.CommandResultBuilder commandResultBuilder = CommandResult.builder();
+        CommandResultDto.CommandResultDtoBuilder commandResultBuilder = CommandResultDto.builder();
         commandResultBuilder.targetStatus(request.getDesiredStatus());
 
 

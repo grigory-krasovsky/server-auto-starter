@@ -1,11 +1,15 @@
 package com.example.serverautostarter.hetzner.service;
 
+import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
 import com.example.serverautostarter.hetzner.db.pojo.ServerPojo;
+import io.github.sinuscosinustan.hetznercloud.objects.response.CreateServerResponse;
 import io.github.sinuscosinustan.hetznercloud.objects.response.ServersResponse;
 
 public interface ServerManager {
     ServersResponse listAllServers();
-    Boolean createNewServer(ServerPojo serverPojo);
+    CreateServerResponse createNewServer(ServerPojo serverPojo);
     Boolean deleteServer(Long id);
-    Boolean resetRootPasswordServer(Long serverId);
+    String resetRootPassword(Long serverId);
+
+//    Boolean runDefaultPipeline(ServerRequestDto serverRequestDto);
 }

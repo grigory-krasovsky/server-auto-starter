@@ -1,6 +1,6 @@
 package com.example.serverautostarter.hetzner.service.impl;
 
-import com.example.serverautostarter.common.dto.CommandRequest;
+import com.example.serverautostarter.common.dto.CommandRequestDto;
 import com.example.serverautostarter.common.service.SshService;
 import com.example.serverautostarter.common.service.impl.SshServiceImpl;
 import com.example.serverautostarter.hetzner.enums.ServerCommands;
@@ -25,9 +25,9 @@ public class ServerProvisionerImpl implements ServerProvisioner {
     @Override
     public void runInitialScripts(String ip, String pass) {
 
-        List<CommandRequest> commands = Arrays.stream(ServerCommands.values())
+        List<CommandRequestDto> commands = Arrays.stream(ServerCommands.values())
                 .sorted(Comparator.comparingInt(ServerCommands::getOrder))
-                .map(CommandRequest::from).toList();
+                .map(CommandRequestDto::from).toList();
 
         SshService sshService = new SshServiceImpl();
         sshService.runInitialScripts(ip, pass, commands);
@@ -36,12 +36,12 @@ public class ServerProvisionerImpl implements ServerProvisioner {
     @Override
     public void runTestScripts(String ip, String pass) {
 
-        List<CommandRequest> commands = new ArrayList<String>() {{
+        List<CommandRequestDto> commands = new ArrayList<String>() {{
             add("mkdir test");
             add("cd test");
             add("echo 'Hello World' > hello.txt");
             add("cat hello.txt");
-        }}.stream().map(command -> CommandRequest.builder()
+        }}.stream().map(command -> CommandRequestDto.builder()
                 .script(command)
                 .timeout(DEFAULT_TIMEOUT_SECONDS)
                 .description("test")
