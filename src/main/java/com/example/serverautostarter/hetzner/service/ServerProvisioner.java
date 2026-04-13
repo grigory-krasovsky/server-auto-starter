@@ -1,9 +1,11 @@
 package com.example.serverautostarter.hetzner.service;
 
-import com.example.serverautostarter.hetzner.enums.ServerStatus;
+import com.example.serverautostarter.common.dto.CommandRequestDto;
 
 public interface ServerProvisioner {
     void runInitialScripts(String ip, String rootPass);
-    void runScripts(String ip, String rootPass, ServerStatus initialStatus);
+    void runSingleScript(String ip, String rootPass, CommandRequestDto command);
     void runTestScripts(String ip, String rootPass);
+
+    boolean connectSuccessful(String ip, String rootPass);
 }

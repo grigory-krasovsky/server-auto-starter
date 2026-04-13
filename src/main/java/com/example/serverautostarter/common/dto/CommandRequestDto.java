@@ -1,7 +1,7 @@
 package com.example.serverautostarter.common.dto;
 
 import com.example.serverautostarter.hetzner.enums.ServerCommands;
-import com.example.serverautostarter.hetzner.enums.ServerStatus;
+import com.example.serverautostarter.hetzner.enums.ServerStatusEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +17,7 @@ public class CommandRequestDto {
     @NotNull
     Integer timeout;
     String description;
-    ServerStatus desiredStatus;
+    ServerStatusEnum desiredStatus;
 
     public static CommandRequestDto from(ServerCommands serverCommands) {
         return CommandRequestDto.builder()

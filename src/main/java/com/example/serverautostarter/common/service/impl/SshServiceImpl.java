@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public class SshServiceImpl implements SshService {
 
@@ -46,6 +47,16 @@ public class SshServiceImpl implements SshService {
         return resultMap;
     }
 
+    @Override
+    public boolean connectSuccessful(String ip, String rootPass) {
+        try {
+            connect(ip, "root", rootPass);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
     private void connect(String host, String username, String password) throws JSchException {
         JSch jsch = new JSch();
         session = jsch.getSession(username, host, 22);
@@ -54,7 +65,19 @@ public class SshServiceImpl implements SshService {
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", "no");
         session.setConfig(config);
-        session.connect(30000);
+        IntStream.of(3).forEach(attempt -> {
+            try {
+                session.connect(30000);
+            } catch (JSchException | RuntimeException e) {
+                System.out.printf("Attempt %s...%n", attempt);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
     }
 
     private void disconnect() {

@@ -1,6 +1,6 @@
 package com.example.serverautostarter.common.dto;
 
-import com.example.serverautostarter.hetzner.enums.ServerStatus;
+import com.example.serverautostarter.hetzner.enums.ServerStatusEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +13,5 @@ public class CommandResultDto {
     int exitCode;
     String output;
     String error;
-    ServerStatus targetStatus;
+    ServerStatusEnum targetStatus;
 }

@@ -11,4 +11,5 @@ public interface SshService {
     Map<CommandRequestDto, CommandResultDto> runScripts(String ip, String rootPass, String amneziaPass, List<CommandRequestDto> commands, LogService logService);
 
     int DEFAULT_TIMEOUT_SECONDS = 10;
+    boolean connectSuccessful(String ip, String rootPass);
 }

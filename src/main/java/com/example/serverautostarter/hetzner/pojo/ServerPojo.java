@@ -21,10 +21,12 @@ public class ServerPojo {
     Boolean blocked;
     String passDecrypted;
     String passEncrypted;
+    Boolean initializationCompleted;
 
     public static ServerPojo from(ServerRequestDto serverRequestDto) {
         return ServerPojo.builder()
                 .name(serverRequestDto.getName())
+                .initializationCompleted(false)
                 .build();
     }
 
@@ -36,6 +38,8 @@ public class ServerPojo {
                 .blocked(serverPojo.getBlocked())
                 .created(LocalDateTime.now())
                 .rootPassEncrypted(serverPojo.getPassEncrypted())
+                .initializationCompleted(serverPojo.getInitializationCompleted())
+                .id(serverPojo.id)
                 .build();
     }
 
@@ -46,6 +50,7 @@ public class ServerPojo {
                 .hetznerId(server.getHetznerId())
                 .blocked(server.getBlocked())
                 .passEncrypted(server.getRootPassEncrypted())
+                .initializationCompleted(server.getInitializationCompleted())
                 .build();
     }
 
@@ -55,6 +60,7 @@ public class ServerPojo {
                 .ip(hetznerServer.getPublicNet().getIpv4().getIp())
                 .name(hetznerServer.getName())
                 .hetznerId(hetznerServer.getId())
+                .initializationCompleted(false)
                 .blocked(false)
                 .passDecrypted(serverResponse.getRootPassword())
                 .build();

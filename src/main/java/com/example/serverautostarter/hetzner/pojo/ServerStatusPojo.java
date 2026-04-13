@@ -1,7 +1,7 @@
 package com.example.serverautostarter.hetzner.pojo;
 
 import com.example.serverautostarter.hetzner.db.entity.Server;
-import com.example.serverautostarter.hetzner.enums.ServerStatus;
+import com.example.serverautostarter.hetzner.enums.ServerStatusEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +14,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServerStatusPojo {
     Boolean creationInitiated;
-    ServerStatus status;
+    ServerStatusEnum status;
     String error;
     Long serverId;
 
-    public static ServerStatusPojo from(ServerStatus serverStatusEnum) {
+    public static ServerStatusPojo from(ServerStatusEnum serverStatusEnum) {
         return ServerStatusPojo.builder()
                 .status(serverStatusEnum)
                 .build();

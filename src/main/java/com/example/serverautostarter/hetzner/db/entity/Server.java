@@ -23,4 +23,5 @@ public class Server extends AbstractEntity {
     Boolean blocked;
     String rootPassEncrypted;
     Long hetznerId;
+    Boolean initializationCompleted;
 }

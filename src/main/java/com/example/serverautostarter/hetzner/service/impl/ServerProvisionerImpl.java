@@ -5,14 +5,12 @@ import com.example.serverautostarter.common.dto.CommandResultDto;
 import com.example.serverautostarter.common.service.SshService;
 import com.example.serverautostarter.common.service.impl.SshServiceImpl;
 import com.example.serverautostarter.hetzner.enums.ServerCommands;
-import com.example.serverautostarter.hetzner.enums.ServerStatus;
 import com.example.serverautostarter.hetzner.service.ServerProvisioner;
 import com.example.serverautostarter.utils.service.LogService;
 import com.example.serverautostarter.utils.service.PasswordManager;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -39,8 +37,9 @@ public class ServerProvisionerImpl implements ServerProvisioner {
     }
 
     @Override
-    public void runScripts(String ip, String rootPass, ServerStatus initialStatus) {
-
+    public void runSingleScript(String ip, String rootPass, CommandRequestDto command) {
+        SshService sshService = new SshServiceImpl();
+        sshService.runScripts(ip, rootPass, passwordManager.getAmneziaPass(), List.of(command), logService);
     }
 
     @Override
@@ -59,5 +58,11 @@ public class ServerProvisionerImpl implements ServerProvisioner {
 
         SshService sshService = new SshServiceImpl();
         sshService.runScripts(ip, pass, passwordManager.getAmneziaPass(), commands, logService);
+    }
+
+    @Override
+    public boolean connectSuccessful(String ip, String rootPass) {
+        SshService sshService = new SshServiceImpl();
+        return sshService.connectSuccessful(ip, rootPass);
     }
 }
