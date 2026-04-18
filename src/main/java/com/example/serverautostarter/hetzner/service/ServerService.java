@@ -8,6 +8,7 @@ import java.util.List;
 public interface ServerService {
     Server saveServerData(ServerPojo serverPojo);
     Server findByHetznerId(Long id);
+    Server findById(Long id);
     List<Server> findAllUncompleted();
     void deleteById(Long id);
     void updateServer(Server server);

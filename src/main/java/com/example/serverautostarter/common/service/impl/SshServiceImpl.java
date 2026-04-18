@@ -65,7 +65,7 @@ public class SshServiceImpl implements SshService {
         java.util.Properties config = new java.util.Properties();
         config.put("StrictHostKeyChecking", "no");
         session.setConfig(config);
-        IntStream.of(3).forEach(attempt -> {
+        IntStream.range(1, 4).forEach(attempt -> {
             try {
                 session.connect(30000);
             } catch (JSchException | RuntimeException e) {

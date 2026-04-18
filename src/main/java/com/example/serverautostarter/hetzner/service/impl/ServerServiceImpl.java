@@ -33,6 +33,11 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
+    public Server findById(Long id) {
+        return serverJpaRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public List<Server> findAllUncompleted() {
         return serverJpaRepository.findAllByInitializationCompleted(false);
     }

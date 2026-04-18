@@ -1,7 +1,6 @@
 package com.example.serverautostarter.hetzner.controller;
 
 import com.example.serverautostarter.hetzner.controller.dto.ScriptDto;
-import com.example.serverautostarter.hetzner.pojo.ServerPojo;
 import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
 import com.example.serverautostarter.hetzner.service.ServerManager;
 import com.example.serverautostarter.hetzner.service.ServerProvisioner;
