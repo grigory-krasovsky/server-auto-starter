@@ -101,22 +101,26 @@ public class TelegramService {
     }
 
     private MessageResult handleServerNameInput(Long chatId, String serverName) {
-        String validationError = validateServerName(serverName);
-        if (validationError != null) {
-            return new MessageResult(chatId, validationError, null);
-        }
+
         if (serverName.equals("/cancel")) {
             chatIdToServerName.remove(chatId);
             return new MessageResult(chatId, "❌ Создание сервера отменено.", null);
         }
-
+        String validationError = validateServerName(serverName);
+        if (validationError != null) {
+            chatIdToServerName.remove(chatId);
+            return new MessageResult(chatId, validationError, null);
+        }
         // Сохраняем имя сервера
         chatIdToServerName.put(chatId, serverName);
 
         String confirmMessage = String.format(
-                "📝 *Подтверждение создания сервера*\n\n" +
-                        "Название: *%s*\n\n" +
-                        "Создать сервер?",
+                """
+                        📝 *Подтверждение создания сервера*
+
+                        Название: *%s*
+
+                        Создать сервер?""",
                 serverName
         );
 
@@ -290,40 +294,40 @@ public class TelegramService {
     private String validateServerName(String name) {
         // Проверка на null или пустую строку
         if (name == null || name.trim().isEmpty()) {
-            return "❌ Имя сервера не может быть пустым.\n\nПопробуйте снова:";
+            return "❌ Имя сервера не может быть пустым.";
         }
 
         name = name.trim();
 
         // Проверка на длину (Hetzner: от 2 до 64 символов)
         if (name.length() < 2) {
-            return "❌ Имя сервера должно содержать минимум 2 символа.\n\nПопробуйте снова:";
+            return "❌ Имя сервера должно содержать минимум 2 символа.";
         }
 
         if (name.length() > 64) {
-            return "❌ Имя сервера не может превышать 64 символа.\n\nПопробуйте снова:";
+            return "❌ Имя сервера не может превышать 64 символа.";
         }
 
         // Первый символ должен быть буквой или цифрой
         char firstChar = name.charAt(0);
         if (!Character.isLetterOrDigit(firstChar)) {
-            return "❌ Имя сервера должно начинаться с буквы или цифры.\n\nПопробуйте снова:";
+            return "❌ Имя сервера должно начинаться с буквы или цифры.";
         }
 
         // Последний символ не может быть дефисом или точкой
         char lastChar = name.charAt(name.length() - 1);
         if (lastChar == '-' || lastChar == '.') {
-            return "❌ Имя сервера не может заканчиваться на '-' или '.'.\n\nПопробуйте снова:";
+            return "❌ Имя сервера не может заканчиваться на '-' или '.'.";
         }
 
         // Проверка допустимых символов: буквы, цифры, минусы, точки
         if (!name.matches("^[A-Za-z0-9][A-Za-z0-9\\-\\.]*[A-Za-z0-9]$")) {
-            return "❌ Имя сервера может содержать только буквы (A-Z), цифры (0-9), минусы (-) и точки (.).\n\nПопробуйте снова:";
+            return "❌ Имя сервера может содержать только буквы (A-Z), цифры (0-9), минусы (-) и точки (.).";
         }
 
         // Проверка на уникальность
         if (serverService.findByName(name) != null) {
-            return String.format("❌ Сервер с именем '%s' уже существует.\n\nПопробуйте другое имя:", name);
+            return String.format("❌ Сервер с именем '%s' уже существует.", name);
         }
 
         return null; // Валидация пройдена
