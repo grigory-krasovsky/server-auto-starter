@@ -98,9 +98,9 @@ public class ServerManagerImpl implements ServerManager {
     @Transactional
     public Boolean deleteServer(Long id) {
         try {
-            hetznerCloudAPI.deleteServer(id);
             Optional.ofNullable(serverService.findById(id))
                     .ifPresent((server) -> {
+                        hetznerCloudAPI.deleteServer(server.getHetznerId());
                         serverStatusService.deleteByServer(server);
                         serverService.deleteById(server.getId());
                     });

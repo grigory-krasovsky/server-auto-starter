@@ -10,5 +10,6 @@ import java.util.List;
 public interface ServerJpaRepository extends JpaRepository<Server, Long> {
     List<Server> findAllByInitializationCompleted(Boolean completed);
     Server findByHetznerId(Long id);
+    Server findByName(String name);
     void deleteById(Long id);
 }

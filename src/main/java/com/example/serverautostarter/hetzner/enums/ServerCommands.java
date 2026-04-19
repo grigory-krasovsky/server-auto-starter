@@ -5,7 +5,6 @@ import lombok.Getter;
 import java.util.Arrays;
 
 import static com.example.serverautostarter.common.service.SshService.DEFAULT_TIMEOUT_SECONDS;
-import static com.example.serverautostarter.hetzner.enums.ServerStatusEnum.WAITING_FOR_ROOT_PASS_CHANGE;
 
 @Getter
 public enum ServerCommands {

@@ -28,8 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import static com.example.serverautostarter.hetzner.enums.ServerCommands.ROOT_PASS_CHANGING;
-import static com.example.serverautostarter.hetzner.enums.ServerStatusEnum.READY_FOR_INITIAL_SCRIPTS;
-import static com.example.serverautostarter.hetzner.enums.ServerStatusEnum.WAITING_FOR_ROOT_PASS_CHANGE;
+import static com.example.serverautostarter.hetzner.enums.ServerStatusEnum.*;
 
 @Service
 @AllArgsConstructor
@@ -56,6 +55,9 @@ public class ServerTasksExecutor {
         ServerStatus serverCurrentStatus = serverStatusService.getServerCurrentStatus(server);
         ServerCommands commandForNextStep = ServerCommands.getCommandForNextStep(serverCurrentStatus.getStatus());
         if (commandForNextStep == null) {
+            server.setInitializationCompleted(true);
+            serverService.updateServer(server);
+            serverStatusService.saveStatus(ServerStatusPojo.from(READY_FOR_AMNEZIA), server);
             return;
         }
         ServerStatusEnum newStatus;

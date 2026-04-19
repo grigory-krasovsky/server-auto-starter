@@ -38,8 +38,18 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
+    public Server findByName(String name) {
+        return serverJpaRepository.findByName(name);
+    }
+
+    @Override
     public List<Server> findAllUncompleted() {
         return serverJpaRepository.findAllByInitializationCompleted(false);
+    }
+
+    @Override
+    public List<Server> findAll() {
+        return serverJpaRepository.findAll();
     }
 
     @Override
