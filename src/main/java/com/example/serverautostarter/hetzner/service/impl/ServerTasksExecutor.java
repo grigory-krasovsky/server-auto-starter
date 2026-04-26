@@ -46,7 +46,7 @@ public class ServerTasksExecutor {
     PasswordManager passwordManager;
 
 
-    @Scheduled(fixedRate = 15, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = 15, timeUnit = TimeUnit.SECONDS)
     public void processServers() {
         List<Server> allUncompleted = serverService.findAllUncompleted().stream().toList();
         allUncompleted.forEach(this::processStage);
