@@ -53,30 +53,32 @@ public class SshServiceImpl implements SshService {
             connect(ip, "root", rootPass);
         } catch (Exception e) {
             return false;
+        } finally {
+            disconnect();
         }
         return true;
     }
 
     private void connect(String host, String username, String password) throws JSchException {
-        JSch jsch = new JSch();
-        session = jsch.getSession(username, host, 22);
-        session.setPassword(password);
-
-        java.util.Properties config = new java.util.Properties();
-        config.put("StrictHostKeyChecking", "no");
-        session.setConfig(config);
-        IntStream.range(1, 4).forEach(attempt -> {
+        for (int i = 1; i < 4; i++) {
             try {
+                JSch jsch = new JSch();
+                session = jsch.getSession(username, host, 22);
+                session.setPassword(password);
+
+                java.util.Properties config = new java.util.Properties();
+                config.put("StrictHostKeyChecking", "no");
+                session.setConfig(config);
                 session.connect(30000);
             } catch (JSchException | RuntimeException e) {
-                System.out.printf("Attempt %s...%n", attempt);
+                System.out.printf("Attempt %s...%n", i);
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
             }
-        });
+        }
 
     }
 

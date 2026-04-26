@@ -37,9 +37,9 @@ public class ServerProvisionerImpl implements ServerProvisioner {
     }
 
     @Override
-    public void runSingleScript(String ip, String rootPass, CommandRequestDto command) {
+    public Map<CommandRequestDto, CommandResultDto> runSingleScript(String ip, String rootPass, CommandRequestDto command) {
         SshService sshService = new SshServiceImpl();
-        sshService.runScripts(ip, rootPass, passwordManager.getAmneziaPass(), List.of(command), logService);
+        return sshService.runScripts(ip, rootPass, passwordManager.getAmneziaPass(), List.of(command), logService);
     }
 
     @Override

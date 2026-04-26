@@ -1,6 +1,7 @@
 package com.example.serverautostarter.hetzner.service.impl;
 
 import com.example.serverautostarter.common.dto.CommandRequestDto;
+import com.example.serverautostarter.common.dto.CommandResultDto;
 import com.example.serverautostarter.hetzner.db.entity.Server;
 import com.example.serverautostarter.hetzner.db.entity.ServerStatus;
 import com.example.serverautostarter.hetzner.enums.ServerCommands;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -83,7 +85,11 @@ public class ServerTasksExecutor {
             }
         } else {
             try {
-                serverProvisioner.runSingleScript(server.getIp(), Optional.ofNullable(server.getRootPassEncrypted()).map(passwordManager::decrypt).orElse(null), CommandRequestDto.from(commandForNextStep));
+                CommandRequestDto requestDto = CommandRequestDto.from(commandForNextStep);
+                Map<CommandRequestDto, CommandResultDto> map = serverProvisioner.runSingleScript(server.getIp(), Optional.ofNullable(server.getRootPassEncrypted()).map(passwordManager::decrypt).orElse(null), requestDto);
+                if (Optional.ofNullable(map.get(requestDto)).map(result -> result.getExitCode() == -1).orElse(false)) {
+                    throw new RuntimeException("Не удалось выполнить команду: " + Optional.ofNullable(map.get(requestDto)).map(CommandResultDto::getError).orElse(""));
+                }
                 logger.saveInfo(String.format("Выполнена команда для сервера %s. Текущий статус сервера: %s", server.getIp(), commandForNextStep.getServerDesiredStatus()));
                 newStatus = commandForNextStep.getServerDesiredStatus();
             } catch (Exception e) {
