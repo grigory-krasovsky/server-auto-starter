@@ -72,8 +72,6 @@ public class ServerTasksExecutor {
                             if (serverProvisioner.connectSuccessful(server.getIp(), newPass)) {
                                 server.setRootPassEncrypted(passwordManager.encrypt(newPass));
                                 serverService.updateServer(server);
-                                System.out.println("newPass");
-                                System.out.println(newPass);
                                 logger.saveInfo(String.format("Выполнена смена root пароля для сервера %s. Текущий статус сервера: %s", server.getIp(), READY_FOR_INITIAL_SCRIPTS));
                                 return true;
                             }
