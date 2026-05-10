@@ -61,27 +61,51 @@ public class SshServiceImpl implements SshService {
     }
 
     private void connect(String host, String username, String password) throws JSchException {
-        for (int i = 1; i < 4; i++) {
+        JSchException lastException = null;
+
+        for (int i = 1; i <= 3; i++) {
+            JSch jsch = null;
+            Session newSession = null;
+
             try {
-                JSch jsch = new JSch();
-                session = jsch.getSession(username, host, 22);
-                session.setPassword(password);
+                jsch = new JSch();
+                newSession = jsch.getSession(username, host, 22);
+                newSession.setPassword(password);
 
                 java.util.Properties config = new java.util.Properties();
                 config.put("StrictHostKeyChecking", "no");
-                session.setConfig(config);
-                session.connect(30000);
+                // Добавляем поддержку старых алгоритмов для некоторых серверов
+                config.put("kex", "diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha256,diffie-hellman-group1-sha1");
+                newSession.setConfig(config);
+
+                newSession.connect(30000);
+
+                // Успех! Сохраняем сессию
+                this.session = newSession;
+                System.out.printf("Успешное подключение к %s с попытки %d%n", host, i);
+                return;
+
             } catch (JSchException | RuntimeException e) {
-                System.out.println(Arrays.toString(e.getStackTrace()));
-                System.out.printf("Attempt %s...%n", i);
+                lastException = e instanceof JSchException ? (JSchException) e : new JSchException(e.getMessage(), e);
+                System.err.printf("Попытка %d подключения к %s не удалась: %s%n", i, host, e.getMessage());
+
+                // Закрываем сессию если она была создана
+                if (newSession != null && newSession.isConnected()) {
+                    newSession.disconnect();
+                }
+
+                if (i == 3) {
+                    throw new JSchException(String.format("Не удалось подключиться к %s после 3 попыток", host), lastException);
+                }
+
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
+                    Thread.currentThread().interrupt();
+                    throw new JSchException("Прервано ожидание между попытками", ex);
                 }
             }
         }
-
     }
 
     private void disconnect() {
