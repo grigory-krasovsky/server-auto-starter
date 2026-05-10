@@ -11,6 +11,7 @@ import com.jcraft.jsch.Session;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,7 @@ public class SshServiceImpl implements SshService {
                 session.setConfig(config);
                 session.connect(30000);
             } catch (JSchException | RuntimeException e) {
+                System.out.println(Arrays.toString(e.getStackTrace()));
                 System.out.printf("Attempt %s...%n", i);
                 try {
                     Thread.sleep(2000);
