@@ -8,10 +8,7 @@ import com.example.serverautostarter.hetzner.service.ServerManager;
 import com.example.serverautostarter.hetzner.service.ServerService;
 import com.example.serverautostarter.hetzner.service.ServerStatusService;
 import com.example.serverautostarter.utils.service.LogService;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -36,16 +33,31 @@ public class TelegramService {
 
     Map<Long, String> chatIdToServerName = new ConcurrentHashMap<>();
 
+    private final Map<Long, ServerCreationContext> chatIdToCreationContext = new ConcurrentHashMap<>();
+
+    @Value
+    public static class ServerCreationContext {
+        String serverName;
+        String datacenter;
+        CreationStep step;
+    }
+
+    public enum CreationStep {
+        AWAITING_NAME,
+        AWAITING_DATACENTER
+    }
+
     public MessageResult handleTextMessage(Long chatId, String messageText) {
+        // Если пользователь в процессе создания сервера (ожидает ввод имени)
+        if (chatIdToCreationContext.containsKey(chatId)) {
+            ServerCreationContext context = chatIdToCreationContext.get(chatId);
 
-        if (chatIdToServerName.containsKey(chatId)) {
-            return handleServerNameInput(chatId, messageText);
+            if (context.getStep() == CreationStep.AWAITING_NAME) {
+                return handleServerNameInput(chatId, messageText);
+            }
         }
 
-        if (messageText.equals("/list")) {
-            return handleListCommand(chatId);
-        }
-
+        // Обычные команды
         if (messageText.equals("/remove")) {
             return handleRemoveCommand(chatId);
         }
@@ -57,6 +69,11 @@ public class TelegramService {
         if (messageText.equals("/cancel")) {
             return handleCancelCommand(chatId);
         }
+
+        if (messageText.equals("/list")) {
+            return handleListCommand(chatId);
+        }
+
         return null;
     }
 
@@ -70,6 +87,10 @@ public class TelegramService {
 
         if (callbackData.equals("refresh_list")) {
             return handleRefreshList(chatId, messageId);
+        }
+
+        if (callbackData.startsWith("select_dc_")) {
+            return handleDatacenterSelection(chatId, messageId, callbackData);
         }
 
         if (callbackData.startsWith("delete_server_")) {
@@ -86,79 +107,114 @@ public class TelegramService {
         return null;
     }
 
+    private CallbackResult handleDatacenterSelection(Long chatId, Integer messageId, String callbackData) {
+        String datacenter = callbackData.replace("select_dc_", "");
+
+        ServerCreationContext context = chatIdToCreationContext.get(chatId);
+        if (context == null || context.getStep() != CreationStep.AWAITING_DATACENTER) {
+            return new CallbackResult(chatId, messageId, "❌ Сессия создания сервера истекла. Начните заново с /add", null, true);
+        }
+
+        // Сохраняем дата-центр и показываем подтверждение
+        ServerCreationContext updatedContext = new ServerCreationContext(
+                context.getServerName(), datacenter, CreationStep.AWAITING_DATACENTER
+        );
+        chatIdToCreationContext.put(chatId, updatedContext);
+
+        String confirmMessage = String.format(
+                "📝 *Подтверждение создания сервера*\n\n" +
+                        "🖥️ *Название:* %s\n" +
+                        "🗺️ *Дата-центр:* %s\n\n" +
+                        "Создать сервер?",
+                context.getServerName(),
+                getDatacenterName(datacenter)
+        );
+
+        InlineKeyboardMarkup keyboard = keyboardFactory.createConfirmCreationKeyboard(context.getServerName());
+        return new CallbackResult(chatId, messageId, confirmMessage, keyboard, true);
+    }
+
+    private String getDatacenterName(String dc) {
+        return switch (dc) {
+            case "fsn1" -> "Франкфурт (Falkenstein) FSN1";
+            case "hel1" -> "Хельсинки HEL1";
+            case "nbg1" -> "Нюрнберг NBG1";
+            default -> dc;
+        };
+    }
+
     private MessageResult handleAddCommand(Long chatId) {
-        // Создаем новую сессию
-        chatIdToServerName.put(chatId, "null");
+        // Создаем контекст и переходим к шагу ввода имени
+        chatIdToCreationContext.put(chatId, new ServerCreationContext(null, null, CreationStep.AWAITING_NAME));
 
-        String message = """
-                📝 *Создание нового сервера*
-
-                Введите название сервера:
-
-                *(для отмены отправьте /cancel)*""";
+        String message = "📝 *Создание нового сервера*\n\n" +
+                "Введите название сервера:\n\n" +
+                "*(для отмены введите /cancel)*";
 
         return new MessageResult(chatId, message, null);
     }
 
-    private MessageResult handleServerNameInput(Long chatId, String serverName) {
 
+    private MessageResult handleServerNameInput(Long chatId, String serverName) {
         if (serverName.equals("/cancel")) {
-            chatIdToServerName.remove(chatId);
+            chatIdToCreationContext.remove(chatId);
             return new MessageResult(chatId, "❌ Создание сервера отменено.", null);
         }
-        String validationError = validateServerName(serverName);
-        if (validationError != null) {
-            chatIdToServerName.remove(chatId);
-            return new MessageResult(chatId, validationError, null);
-        }
-        // Сохраняем имя сервера
-        chatIdToServerName.put(chatId, serverName);
 
-        String confirmMessage = String.format(
-                """
-                        📝 *Подтверждение создания сервера*
-
-                        Название: *%s*
-
-                        Создать сервер?""",
-                serverName
+        // Сохраняем имя и переходим к выбору дата-центра
+        ServerCreationContext updatedContext = new ServerCreationContext(
+                serverName, null, CreationStep.AWAITING_DATACENTER
         );
+        chatIdToCreationContext.put(chatId, updatedContext);
 
-        InlineKeyboardMarkup keyboard = keyboardFactory.createConfirmCreationKeyboard(serverName);
-        return new MessageResult(chatId, confirmMessage, keyboard);
+        String message = "📝 *Выберите дата-центр для сервера:*\n\n" +
+                "Где будет расположен сервер?";
+
+        InlineKeyboardMarkup keyboard = keyboardFactory.createDatacenterKeyboard();
+        return new MessageResult(chatId, message, keyboard);
     }
 
     private CallbackResult handleConfirmCreate(Long chatId, Integer messageId, String callbackData, String username) {
         String serverName = callbackData.replace("confirm_create_", "");
 
-        try {
-            // Создаем сервер
-            serverManager.createNewServer(ServerRequestDto.builder().name(serverName).build());
+        // Получаем контекст с дата-центром
+        ServerCreationContext context = chatIdToCreationContext.remove(chatId);
 
+        if (context == null) {
+            return new CallbackResult(chatId, messageId, "❌ Сессия создания сервера истекла. Начните заново с /add", null, true);
+        }
+
+        try {
+            // Создаем сервер с указанием дата-центра
+            ServerRequestDto requestDto = ServerRequestDto.builder()
+                    .name(serverName)
+                    .dataCenter(context.getDatacenter())
+                    .build();
+
+            serverManager.createNewServer(requestDto);
             Server createdServer = serverService.findByName(serverName);
 
-            logService.saveInfo(String.format("Сервер с ip %s и названием %s создан",
-                    createdServer.getIp(), createdServer.getName()));
+            logService.saveInfo(String.format("Пользователь @%s создал сервер: %s (IP: %s, DC: %s)",
+                    username, createdServer.getName(), createdServer.getIp(), context.getDatacenter()));
 
-            chatIdToServerName.remove(chatId);
             String successMessage = String.format(
                     """
-                            ✅ *СЕРВЕР СОЗДАН* ✅
-
-                            📌 *IP:* `%s`
-                            🖥️ *Название:* %s
-
-                            Используйте /list для просмотра всех серверов.""",
+                    ✅ *СЕРВЕР СОЗДАН* ✅
+                    
+                    📌 *IP:* `%s`
+                    🖥️ *Название:* %s
+                    🗺️ *Дата-центр:* %s
+                    
+                    Используйте /list для просмотра всех серверов.""",
                     createdServer.getIp(),
-                    createdServer.getName()
+                    createdServer.getName(),
+                    getDatacenterName(context.getDatacenter())
             );
-
 
             return new CallbackResult(chatId, messageId, successMessage, null, true);
 
         } catch (Exception e) {
             logService.saveError("Ошибка создания сервера", e);
-            chatIdToServerName.remove(chatId);
             return new CallbackResult(chatId, messageId,
                     "❌ Ошибка при создании сервера. Попробуйте позже.",
                     null, true);
@@ -166,12 +222,13 @@ public class TelegramService {
     }
 
     private CallbackResult handleCancelCreate(Long chatId, Integer messageId) {
+        chatIdToCreationContext.remove(chatId);
         return new CallbackResult(chatId, messageId, "❌ Создание сервера отменено.", null, true);
     }
 
     private MessageResult handleCancelCommand(Long chatId) {
-        if (chatIdToServerName.containsKey(chatId)) {
-            chatIdToServerName.remove(chatId);
+        if (chatIdToCreationContext.containsKey(chatId)) {
+            chatIdToCreationContext.remove(chatId);
             return new MessageResult(chatId, "❌ Создание сервера отменено.", null);
         }
         return new MessageResult(chatId, "Нет активных операций для отмены.", null);

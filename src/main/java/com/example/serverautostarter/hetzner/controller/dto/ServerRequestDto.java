@@ -15,4 +15,5 @@ public class ServerRequestDto {
     String name;
 
     Long hetznerId;
+    String dataCenter;
 }

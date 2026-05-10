@@ -72,6 +72,7 @@ public class ServerManagerImpl implements ServerManager {
             CreateServerResponse response = hetznerCloudAPI.createServer(CreateServerRequest.builder()
                     .name(serverRequestDto.getName())
                     .serverType(ServerType.CX_23.getCode())
+                    .location(serverRequestDto.getDataCenter())
                     .image(OsType.UBUNTU_24_04.getCode())
                     .startAfterCreate(true)
                     .build());

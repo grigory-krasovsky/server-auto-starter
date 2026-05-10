@@ -66,4 +66,36 @@ public class KeyboardFactory {
         markup.setKeyboard(keyboard);
         return markup;
     }
+
+    public InlineKeyboardMarkup createDatacenterKeyboard() {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
+
+        // Дата-центры Hetzner
+        String[][] datacenters = {
+                {"fsn1", "🇩🇪 Falkenstein (FSN1)"},
+                {"hel1", "🇫🇮 Helsinki (HEL1)"},
+                {"nbg1", "🇩🇪 Nuremberg (NBG1)"}
+        };
+
+        for (String[] dc : datacenters) {
+            List<InlineKeyboardButton> row = new ArrayList<>();
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(dc[1]);
+            button.setCallbackData("select_dc_" + dc[0]);
+            row.add(button);
+            keyboard.add(row);
+        }
+
+        // Кнопка отмены
+        List<InlineKeyboardButton> cancelRow = new ArrayList<>();
+        InlineKeyboardButton cancelButton = new InlineKeyboardButton();
+        cancelButton.setText("❌ Отмена");
+        cancelButton.setCallbackData("cancel_create");
+        cancelRow.add(cancelButton);
+        keyboard.add(cancelRow);
+
+        markup.setKeyboard(keyboard);
+        return markup;
+    }
 }
