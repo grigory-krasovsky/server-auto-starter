@@ -1,7 +1,6 @@
 package com.example.serverautostarter.hetzner.service;
 
 import com.example.serverautostarter.hetzner.controller.dto.ServerRequestDto;
-import com.example.serverautostarter.hetzner.pojo.ServerPojo;
 import io.github.sinuscosinustan.hetznercloud.objects.response.CreateServerResponse;
 import io.github.sinuscosinustan.hetznercloud.objects.response.ServerResponse;
 import io.github.sinuscosinustan.hetznercloud.objects.response.ServersResponse;

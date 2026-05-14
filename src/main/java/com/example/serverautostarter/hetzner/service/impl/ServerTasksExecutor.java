@@ -6,7 +6,6 @@ import com.example.serverautostarter.hetzner.db.entity.Server;
 import com.example.serverautostarter.hetzner.db.entity.ServerStatus;
 import com.example.serverautostarter.hetzner.enums.ServerCommands;
 import com.example.serverautostarter.hetzner.enums.ServerStatusEnum;
-import com.example.serverautostarter.hetzner.pojo.ServerPojo;
 import com.example.serverautostarter.hetzner.pojo.ServerStatusPojo;
 import com.example.serverautostarter.hetzner.service.ServerManager;
 import com.example.serverautostarter.hetzner.service.ServerProvisioner;
@@ -24,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;

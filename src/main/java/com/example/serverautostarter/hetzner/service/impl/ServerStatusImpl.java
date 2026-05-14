@@ -3,7 +3,6 @@ package com.example.serverautostarter.hetzner.service.impl;
 import com.example.serverautostarter.hetzner.db.entity.Server;
 import com.example.serverautostarter.hetzner.db.entity.ServerStatus;
 import com.example.serverautostarter.hetzner.db.repository.ServerStatusJpaRepository;
-import com.example.serverautostarter.hetzner.pojo.ServerPojo;
 import com.example.serverautostarter.hetzner.pojo.ServerStatusPojo;
 import com.example.serverautostarter.hetzner.service.ServerStatusService;
 import lombok.AccessLevel;

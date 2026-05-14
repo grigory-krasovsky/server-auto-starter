@@ -4,7 +4,10 @@ import com.example.serverautostarter.utils.db.entity.Log;
 import com.example.serverautostarter.utils.db.repository.LogJpaRepository;
 import com.example.serverautostarter.utils.enums.LogLevel;
 import com.example.serverautostarter.utils.service.LogService;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
